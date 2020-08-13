@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  spring-boot-A-1:
+    image: ttmo/listen-dog:11
+    working_dir: /project
+    command: listenDog.sh target java -jar target/p1-spring-boot-A-1.0.0-SNAPSHOT.jar
+    tty: true
+    volumes:
+      - ./p1-spring-boot-A:/project
+    environment:
+      CLUSTER_ID: A-1
+    ports:
+      - 80:8080
