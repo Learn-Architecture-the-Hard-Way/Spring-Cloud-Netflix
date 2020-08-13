@@ -1,0 +1,4 @@
+server:
+  port: 8081
+
+cluster-id: ${CLUSTER_ID:CLUSTER_ID is undefined.}
