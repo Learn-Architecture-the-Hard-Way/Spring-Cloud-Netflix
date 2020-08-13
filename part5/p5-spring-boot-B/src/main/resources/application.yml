@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: spring-boot-B
+
+cluster-id: ${CLUSTER_ID:CLUSTER_ID is undefined.}
+
+eureka:
+  instance:
+    instance-id: spring-boot-${cluster-id}
+  client:
+    service-url:
+      defaultZone: ${SUREKA_SERVER:http://spring-cloud-eureka:8761/eureka}

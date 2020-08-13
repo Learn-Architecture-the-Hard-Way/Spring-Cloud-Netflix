@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: spring-boot-A
+
+cluster-id: ${CLUSTER_ID:CLUSTER_ID is undefined.}
+
+eureka:
+  instance:
+    instance-id: spring-boot-${cluster-id}
+  client:
+    service-url:
+      defaultZone: ${SUREKA_SERVER:http://spring-cloud-eureka:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: false
