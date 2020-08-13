@@ -1,0 +1,76 @@
+version: '3.8'
+
+x-springBootBase:
+  &springBootBase
+  image: ttmo/listen-dog:11
+  working_dir: /project
+  tty: true
+  networks:
+    - net
+
+x-springBootA:
+  &springBootA
+  <<: *springBootBase
+  command: listenDog.sh target java -jar target/p4-spring-boot-A-1.0.0-SNAPSHOT.jar
+  volumes:
+    - ./p4-spring-boot-A:/project
+
+x-springBootB:
+  &springBootB
+  <<: *springBootBase
+  command: listenDog.sh target java -jar target/p4-spring-boot-B-1.0.0-SNAPSHOT.jar
+  volumes:
+    - ./p4-spring-boot-B:/project
+
+x-springCloudEureka:
+  &springCloudEureka
+  <<: *springBootBase
+  command: listenDog.sh target java -jar target/p4-spring-cloud-eureka-1.0.0-SNAPSHOT.jar
+  volumes:
+    - ./p4-spring-cloud-eureka:/project
+
+networks:
+  net:
+
+services:
+  nginx:
+    depends_on:
+      - spring-boot-A-1
+      - spring-boot-B-1
+    image: nginx
+    networks:
+      - net
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:ro
+
+  spring-boot-A-1:
+    <<: *springBootA
+    environment:
+      CLUSTER_ID: A-1
+    ports:
+      - 8080:8080
+
+  spring-boot-B-1:
+    <<: *springBootB
+    depends_on:
+      - spring-cloud-eureka
+    environment:
+      CLUSTER_ID: B-1
+    ports:
+      - 8081:8081
+
+  spring-boot-B-2:
+    <<: *springBootB
+    depends_on:
+      - spring-cloud-eureka
+    environment:
+      CLUSTER_ID: B-2
+    ports:
+      - 8082:8081
+
+  spring-cloud-eureka:
+    <<: *springCloudEureka
+    ports:
+      - 8761:8761
