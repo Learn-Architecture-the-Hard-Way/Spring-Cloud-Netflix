@@ -1,0 +1,53 @@
+version: '3.8'
+
+x-springBootBase:
+  &springBootBase
+  image: ttmo/listen-dog:11
+  working_dir: /project
+  tty: true
+  networks:
+    - net
+
+x-springBootA:
+  &springBootA
+  <<: *springBootBase
+  command: listenDog.sh target java -jar target/p3-spring-boot-A-1.0.0-SNAPSHOT.jar
+  volumes:
+    - ./p3-spring-boot-A:/project
+
+x-springBootB:
+  &springBootB
+  <<: *springBootBase
+  command: listenDog.sh target java -jar target/p3-spring-boot-B-1.0.0-SNAPSHOT.jar
+  volumes:
+    - ./p3-spring-boot-B:/project
+
+networks:
+  net:
+
+services:
+  nginx:
+    depends_on:
+      - spring-boot-A-1
+      - spring-boot-B-1
+    image: nginx
+    networks:
+      - net
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:ro
+
+  spring-boot-A-1:
+    <<: *springBootA
+    environment:
+      CLUSTER_ID: A-1
+    ports:
+      - 8080:8080
+
+  spring-boot-B-1:
+    <<: *springBootB
+    environment:
+      CLUSTER_ID: B-1
+    ports:
+      - 8081:8081
